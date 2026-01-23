@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 
 class AppTheme {
   // Colors
-  static const Color primaryColor = Color(0xFF6F00FF); // Vivid Purple
-  static const Color secondaryColor = Color(0xFF00E5FF); // Cyan
+  static const Color primaryColor = Color(0xFF000000);
+  static const Color secondaryColor = Color(0xFFD4AF37);
   static const Color backgroundColor = Color(0xFF121212); // Deep Dark
 
   // Glass Effects
   static const double glassBlur = 20.0;
   static const double glassOpacity = 0.15;
-  static const double glassBorderOpacity = 0.2;
+  static const double glassBorderOpacity = 0.3;
 
   static LinearGradient glassGradient = LinearGradient(
     begin: Alignment.topLeft,
@@ -29,7 +29,7 @@ class AppTheme {
   static ThemeData get darkTheme {
     return ThemeData(
       brightness: Brightness.dark,
-      scaffoldBackgroundColor: backgroundColor,
+      scaffoldBackgroundColor: Colors.transparent,
       primaryColor: primaryColor,
       textTheme: ThemeData.dark().textTheme.copyWith(
         bodyLarge: const TextStyle(fontFamily: '.SF NS Text'),

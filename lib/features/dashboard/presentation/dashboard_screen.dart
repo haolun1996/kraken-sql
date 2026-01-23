@@ -76,7 +76,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [Color(0xFF2E0249), Color(0xFF000000), Color(0xFF0F3460)],
+            colors: [Color(0xFF323232), Color(0xFF545454), Color(0xFF656565)],
           ),
         ),
         child: SafeArea(
