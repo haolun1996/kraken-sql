@@ -354,7 +354,13 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                     style: TextStyle(color: Colors.white.withOpacity(0.5)),
                   ),
                 )
-              : ListView.builder(
+              : GridView.builder(
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 16,
+                    mainAxisSpacing: 16,
+                    childAspectRatio: 3.5,
+                  ),
                   itemCount: connections.length,
                   itemBuilder: (context, index) {
                     final conn = connections[index];
@@ -485,7 +491,6 @@ class _ConnectionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GlassContainer(
-      margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       gradient: isActive
           ? LinearGradient(
