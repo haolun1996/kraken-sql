@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:macos_window_utils/macos_window_utils.dart';
 import 'package:sqlbench/core/theme/app_theme.dart';
 import 'package:sqlbench/features/dashboard/presentation/dashboard_screen.dart';
 import 'package:window_manager/window_manager.dart';
@@ -9,7 +8,6 @@ import 'package:window_manager/window_manager.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await windowManager.ensureInitialized();
-  await WindowManipulator.initialize();
 
   WindowOptions windowOptions = const WindowOptions(
     size: Size(1200, 800),
@@ -21,10 +19,6 @@ void main() async {
   );
 
   await windowManager.waitUntilReadyToShow(windowOptions, () async {
-    WindowManipulator.makeWindowFullyTransparent();
-    WindowManipulator.makeTitlebarTransparent();
-    WindowManipulator.enableFullSizeContentView();
-    await WindowManipulator.enableShadow();
     await windowManager.show();
     await windowManager.focus();
   });
@@ -76,7 +70,7 @@ class KeyboardShortcutHandler extends StatelessWidget {
         }
         return KeyEventResult.ignored;
       },
-      child: TitlebarSafeArea(child: child),
+      child: child,
     );
   }
 }

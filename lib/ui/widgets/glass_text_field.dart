@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:sqlbench/ui/widgets/glass_container.dart';
 
 class GlassTextField extends StatelessWidget {
   final String? label;
@@ -35,8 +34,13 @@ class GlassTextField extends StatelessWidget {
           ),
           const SizedBox(height: 8),
         ],
-        GlassContainer(
+        Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            color: Colors.white.withOpacity(0.1),
+            border: Border.all(color: Colors.white.withOpacity(0.1)),
+          ),
           child: TextField(
             controller: controller,
             obscureText: obscureText,

@@ -4,7 +4,6 @@ import 'package:sqlbench/core/theme/app_theme.dart';
 import 'package:sqlbench/features/connection/data/connection_model.dart';
 import 'package:sqlbench/features/connection/data/connection_provider.dart';
 import 'package:sqlbench/ui/widgets/glass_button.dart';
-import 'package:sqlbench/ui/widgets/glass_container.dart';
 import 'package:sqlbench/ui/widgets/glass_text_field.dart';
 
 class ConnectionDialog {
@@ -21,10 +20,12 @@ class _ConnectionDialogContent extends ConsumerStatefulWidget {
   const _ConnectionDialogContent();
 
   @override
-  ConsumerState<_ConnectionDialogContent> createState() => _ConnectionDialogContentState();
+  ConsumerState<_ConnectionDialogContent> createState() =>
+      _ConnectionDialogContentState();
 }
 
-class _ConnectionDialogContentState extends ConsumerState<_ConnectionDialogContent> {
+class _ConnectionDialogContentState
+    extends ConsumerState<_ConnectionDialogContent> {
   final _nameController = TextEditingController();
   final _hostController = TextEditingController(text: 'localhost');
   final _portController = TextEditingController(text: '3306');
@@ -58,7 +59,9 @@ class _ConnectionDialogContentState extends ConsumerState<_ConnectionDialogConte
       port: int.tryParse(_portController.text) ?? 3306,
       username: _usernameController.text,
       password: _passwordController.text,
-      database: _databaseController.text.isEmpty ? null : _databaseController.text,
+      database: _databaseController.text.isEmpty
+          ? null
+          : _databaseController.text,
     );
 
     try {
@@ -79,12 +82,16 @@ class _ConnectionDialogContentState extends ConsumerState<_ConnectionDialogConte
   void _saveConnection() {
     final model = ConnectionModel(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
-      name: _nameController.text.isEmpty ? 'MySQL Connection' : _nameController.text,
+      name: _nameController.text.isEmpty
+          ? 'MySQL Connection'
+          : _nameController.text,
       host: _hostController.text.isEmpty ? 'localhost' : _hostController.text,
       port: int.tryParse(_portController.text) ?? 3306,
       username: _usernameController.text,
       password: _passwordController.text,
-      database: _databaseController.text.isEmpty ? null : _databaseController.text,
+      database: _databaseController.text.isEmpty
+          ? null
+          : _databaseController.text,
     );
 
     ref.read(connectionProvider.notifier).addConnection(model);
@@ -95,9 +102,21 @@ class _ConnectionDialogContentState extends ConsumerState<_ConnectionDialogConte
   Widget build(BuildContext context) {
     return Dialog(
       backgroundColor: Colors.transparent,
-      child: GlassContainer(
+      child: Container(
         width: 500,
         padding: const EdgeInsets.all(32),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          color: const Color(0xFF2C2C2C), // Solid dark background for dialog
+          border: Border.all(color: Colors.white.withOpacity(0.1)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.3),
+              blurRadius: 20,
+              spreadRadius: 5,
+            ),
+          ],
+        ),
         child: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -126,7 +145,11 @@ class _ConnectionDialogContentState extends ConsumerState<_ConnectionDialogConte
                 controller: _nameController,
               ),
               const SizedBox(height: 16),
-              GlassTextField(label: 'Host', hint: 'localhost', controller: _hostController),
+              GlassTextField(
+                label: 'Host',
+                hint: 'localhost',
+                controller: _hostController,
+              ),
               const SizedBox(height: 16),
               GlassTextField(
                 label: 'Port',
@@ -135,7 +158,11 @@ class _ConnectionDialogContentState extends ConsumerState<_ConnectionDialogConte
                 keyboardType: TextInputType.number,
               ),
               const SizedBox(height: 16),
-              GlassTextField(label: 'Username', hint: 'root', controller: _usernameController),
+              GlassTextField(
+                label: 'Username',
+                hint: 'root',
+                controller: _usernameController,
+              ),
               const SizedBox(height: 16),
               GlassTextField(
                 label: 'Password',
@@ -156,7 +183,9 @@ class _ConnectionDialogContentState extends ConsumerState<_ConnectionDialogConte
                   child: Text(
                     _testResult!,
                     style: TextStyle(
-                      color: _testResult!.contains('✓') ? Colors.greenAccent : Colors.redAccent,
+                      color: _testResult!.contains('✓')
+                          ? Colors.greenAccent
+                          : Colors.redAccent,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -172,7 +201,11 @@ class _ConnectionDialogContentState extends ConsumerState<_ConnectionDialogConte
                     color: AppTheme.secondaryColor,
                   ),
                   const SizedBox(width: 12),
-                  GlassButton(text: 'Save', icon: Icons.save, onPressed: _saveConnection),
+                  GlassButton(
+                    text: 'Save',
+                    icon: Icons.save,
+                    onPressed: _saveConnection,
+                  ),
                 ],
               ),
             ],

@@ -7,7 +7,6 @@ import 'package:sqlbench/features/connection/data/connection_model.dart';
 import 'package:sqlbench/features/connection/data/connection_provider.dart';
 import 'package:sqlbench/ui/widgets/autocomplete_overlay.dart';
 import 'package:sqlbench/ui/widgets/glass_button.dart';
-import 'package:sqlbench/ui/widgets/glass_container.dart';
 
 class QueryEditorScreen extends ConsumerStatefulWidget {
   final ConnectionModel connection;
@@ -120,13 +119,17 @@ class _QueryEditorScreenState extends ConsumerState<QueryEditorScreen> {
 
     // Add SQL keyword matches
     matches.addAll(
-      _sqlKeywords.where((kw) => kw.toLowerCase().startsWith(currentWord.toLowerCase())),
+      _sqlKeywords.where(
+        (kw) => kw.toLowerCase().startsWith(currentWord.toLowerCase()),
+      ),
     );
 
     // Add table name matches if we have a selected database
     if (_selectedDatabase != null && _tables.isNotEmpty) {
       matches.addAll(
-        _tables.where((table) => table.toLowerCase().startsWith(currentWord.toLowerCase())),
+        _tables.where(
+          (table) => table.toLowerCase().startsWith(currentWord.toLowerCase()),
+        ),
       );
     }
 
@@ -150,7 +153,9 @@ class _QueryEditorScreenState extends ConsumerState<QueryEditorScreen> {
 
     final newCursorPos = cursorPos - currentWord.length + suggestion.length;
     final newText =
-        text.substring(0, cursorPos - currentWord.length) + suggestion + text.substring(cursorPos);
+        text.substring(0, cursorPos - currentWord.length) +
+        suggestion +
+        text.substring(cursorPos);
 
     _queryController.value = TextEditingValue(
       text: newText,
@@ -168,7 +173,8 @@ class _QueryEditorScreenState extends ConsumerState<QueryEditorScreen> {
   bool _handleKeyEvent(KeyEvent event) {
     if (event is KeyDownEvent) {
       // Cmd+Enter to execute query
-      if (event.logicalKey == LogicalKeyboardKey.enter && HardwareKeyboard.instance.isMetaPressed) {
+      if (event.logicalKey == LogicalKeyboardKey.enter &&
+          HardwareKeyboard.instance.isMetaPressed) {
         _executeQuery();
         return true;
       }
@@ -179,13 +185,15 @@ class _QueryEditorScreenState extends ConsumerState<QueryEditorScreen> {
     if (event is KeyDownEvent) {
       if (event.logicalKey == LogicalKeyboardKey.arrowDown) {
         setState(() {
-          _selectedSuggestionIndex = (_selectedSuggestionIndex + 1) % _suggestions.length;
+          _selectedSuggestionIndex =
+              (_selectedSuggestionIndex + 1) % _suggestions.length;
         });
         return true;
       } else if (event.logicalKey == LogicalKeyboardKey.arrowUp) {
         setState(() {
           _selectedSuggestionIndex =
-              (_selectedSuggestionIndex - 1 + _suggestions.length) % _suggestions.length;
+              (_selectedSuggestionIndex - 1 + _suggestions.length) %
+              _suggestions.length;
         });
         return true;
       } else if (event.logicalKey == LogicalKeyboardKey.enter ||
@@ -221,7 +229,8 @@ class _QueryEditorScreenState extends ConsumerState<QueryEditorScreen> {
             .toList();
       });
 
-      if (widget.connection.database != null && widget.connection.database!.isNotEmpty) {
+      if (widget.connection.database != null &&
+          widget.connection.database!.isNotEmpty) {
         await _loadTables(widget.connection.database!);
       }
     } catch (e) {
@@ -257,7 +266,10 @@ class _QueryEditorScreenState extends ConsumerState<QueryEditorScreen> {
     });
 
     try {
-      final result = await MySQLService.executeQuery(_connection!, _queryController.text);
+      final result = await MySQLService.executeQuery(
+        _connection!,
+        _queryController.text,
+      );
       setState(() {
         _result = result;
         _isExecuting = false;
@@ -275,18 +287,25 @@ class _QueryEditorScreenState extends ConsumerState<QueryEditorScreen> {
     return Row(
       children: [
         // Database Browser Sidebar
-        GlassContainer(
+        Container(
           width: 250,
           height: double.infinity,
           padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.05),
+            border: Border(
+              right: BorderSide(color: Colors.white.withOpacity(0.1)),
+            ),
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 'Databases',
-                style: Theme.of(
-                  context,
-                ).textTheme.titleMedium?.copyWith(color: Colors.white, fontWeight: FontWeight.bold),
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const SizedBox(height: 16),
               Expanded(
@@ -334,7 +353,6 @@ class _QueryEditorScreenState extends ConsumerState<QueryEditorScreen> {
             ],
           ),
         ),
-        const SizedBox(width: 16),
         // Query Editor
         Expanded(
           child: Column(
@@ -342,10 +360,18 @@ class _QueryEditorScreenState extends ConsumerState<QueryEditorScreen> {
               // Query Input with autocomplete
               Stack(
                 children: [
-                  GlassContainer(
+                  Container(
                     height: 200,
                     width: double.infinity,
                     padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.05),
+                      border: Border(
+                        bottom: BorderSide(
+                          color: Colors.white.withOpacity(0.1),
+                        ),
+                      ),
+                    ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -353,10 +379,11 @@ class _QueryEditorScreenState extends ConsumerState<QueryEditorScreen> {
                           children: [
                             Text(
                               'Query Editor',
-                              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                              ),
+                              style: Theme.of(context).textTheme.titleMedium
+                                  ?.copyWith(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                             ),
                             const Spacer(),
                             GlassButton(
@@ -386,7 +413,9 @@ class _QueryEditorScreenState extends ConsumerState<QueryEditorScreen> {
                               ),
                               decoration: InputDecoration(
                                 hintText: 'SELECT * FROM users;',
-                                hintStyle: TextStyle(color: Colors.white.withOpacity(0.3)),
+                                hintStyle: TextStyle(
+                                  color: Colors.white.withOpacity(0.3),
+                                ),
                                 border: InputBorder.none,
                               ),
                             ),
@@ -403,21 +432,27 @@ class _QueryEditorScreenState extends ConsumerState<QueryEditorScreen> {
                     ),
                 ],
               ),
-              const SizedBox(height: 16),
               // Results
               Expanded(
-                child: GlassContainer(
+                child: Container(
                   width: double.infinity,
                   padding: const EdgeInsets.all(16),
+                  color: Colors
+                      .transparent, // No extra background for results area
                   child: _error != null
                       ? Center(
-                          child: Text(_error!, style: const TextStyle(color: Colors.redAccent)),
+                          child: Text(
+                            _error!,
+                            style: const TextStyle(color: Colors.redAccent),
+                          ),
                         )
                       : _result == null
                       ? Center(
                           child: Text(
                             'Execute a query to see results',
-                            style: TextStyle(color: Colors.white.withOpacity(0.5)),
+                            style: TextStyle(
+                              color: Colors.white.withOpacity(0.5),
+                            ),
                           ),
                         )
                       : _buildResultsTable(),
@@ -441,13 +476,18 @@ class _QueryEditorScreenState extends ConsumerState<QueryEditorScreen> {
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: DataTable(
-          headingRowColor: WidgetStateProperty.all(AppTheme.primaryColor.withOpacity(0.2)),
+          headingRowColor: WidgetStateProperty.all(
+            AppTheme.primaryColor.withOpacity(0.2),
+          ),
           columns: columns
               .map(
                 (col) => DataColumn(
                   label: Text(
                     col,
-                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               )
@@ -481,7 +521,11 @@ class _DatabaseItem extends StatelessWidget {
   final bool isSelected;
   final VoidCallback onDoubleTap;
 
-  const _DatabaseItem({required this.name, required this.isSelected, required this.onDoubleTap});
+  const _DatabaseItem({
+    required this.name,
+    required this.isSelected,
+    required this.onDoubleTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -498,12 +542,19 @@ class _DatabaseItem extends StatelessWidget {
             : null,
         child: Row(
           children: [
-            Icon(Icons.cabin, color: isSelected ? Colors.white : Colors.white60, size: 16),
+            Icon(
+              Icons.cabin,
+              color: isSelected ? Colors.white : Colors.white60,
+              size: 16,
+            ),
             const SizedBox(width: 8),
             Expanded(
               child: Text(
                 name,
-                style: TextStyle(color: isSelected ? Colors.white : Colors.white60, fontSize: 13),
+                style: TextStyle(
+                  color: isSelected ? Colors.white : Colors.white60,
+                  fontSize: 13,
+                ),
                 overflow: TextOverflow.ellipsis,
               ),
             ),
@@ -528,12 +579,19 @@ class _TableItem extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         child: Row(
           children: [
-            Icon(Icons.table_chart_rounded, color: Colors.white.withOpacity(0.5), size: 14),
+            Icon(
+              Icons.table_chart_rounded,
+              color: Colors.white.withOpacity(0.5),
+              size: 14,
+            ),
             const SizedBox(width: 8),
             Expanded(
               child: Text(
                 name,
-                style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 12),
+                style: TextStyle(
+                  color: Colors.white.withOpacity(0.7),
+                  fontSize: 12,
+                ),
                 overflow: TextOverflow.ellipsis,
               ),
             ),

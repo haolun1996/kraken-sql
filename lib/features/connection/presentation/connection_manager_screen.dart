@@ -4,17 +4,18 @@ import 'package:sqlbench/core/theme/app_theme.dart';
 import 'package:sqlbench/features/connection/data/connection_model.dart';
 import 'package:sqlbench/features/connection/data/connection_provider.dart';
 import 'package:sqlbench/ui/widgets/glass_button.dart';
-import 'package:sqlbench/ui/widgets/glass_container.dart';
 import 'package:sqlbench/ui/widgets/glass_text_field.dart';
 
 class ConnectionManagerScreen extends ConsumerStatefulWidget {
   const ConnectionManagerScreen({super.key});
 
   @override
-  ConsumerState<ConnectionManagerScreen> createState() => _ConnectionManagerScreenState();
+  ConsumerState<ConnectionManagerScreen> createState() =>
+      _ConnectionManagerScreenState();
 }
 
-class _ConnectionManagerScreenState extends ConsumerState<ConnectionManagerScreen> {
+class _ConnectionManagerScreenState
+    extends ConsumerState<ConnectionManagerScreen> {
   final _nameController = TextEditingController();
   final _hostController = TextEditingController();
   final _portController = TextEditingController(text: '3306');
@@ -48,7 +49,9 @@ class _ConnectionManagerScreenState extends ConsumerState<ConnectionManagerScree
       port: int.tryParse(_portController.text) ?? 3306,
       username: _usernameController.text,
       password: _passwordController.text,
-      database: _databaseController.text.isEmpty ? null : _databaseController.text,
+      database: _databaseController.text.isEmpty
+          ? null
+          : _databaseController.text,
     );
 
     try {
@@ -74,7 +77,9 @@ class _ConnectionManagerScreenState extends ConsumerState<ConnectionManagerScree
       port: int.tryParse(_portController.text) ?? 3306,
       username: _usernameController.text,
       password: _passwordController.text,
-      database: _databaseController.text.isEmpty ? null : _databaseController.text,
+      database: _databaseController.text.isEmpty
+          ? null
+          : _databaseController.text,
     );
 
     ref.read(connectionProvider.notifier).addConnection(model);
@@ -96,9 +101,14 @@ class _ConnectionManagerScreenState extends ConsumerState<ConnectionManagerScree
         child: SafeArea(
           child: Padding(
             padding: const EdgeInsets.all(24.0),
-            child: GlassContainer(
+            child: Container(
               width: double.infinity,
               padding: const EdgeInsets.all(32),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(16),
+                color: Colors.white.withOpacity(0.1),
+                border: Border.all(color: Colors.white.withOpacity(0.1)),
+              ),
               child: SingleChildScrollView(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -106,16 +116,20 @@ class _ConnectionManagerScreenState extends ConsumerState<ConnectionManagerScree
                     Row(
                       children: [
                         IconButton(
-                          icon: const Icon(Icons.arrow_back, color: Colors.white),
+                          icon: const Icon(
+                            Icons.arrow_back,
+                            color: Colors.white,
+                          ),
                           onPressed: () => Navigator.pop(context),
                         ),
                         const SizedBox(width: 16),
                         Text(
                           'New Connection',
-                          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: Theme.of(context).textTheme.headlineSmall
+                              ?.copyWith(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
                         ),
                       ],
                     ),
@@ -126,7 +140,11 @@ class _ConnectionManagerScreenState extends ConsumerState<ConnectionManagerScree
                       controller: _nameController,
                     ),
                     const SizedBox(height: 20),
-                    GlassTextField(label: 'Host', hint: 'localhost', controller: _hostController),
+                    GlassTextField(
+                      label: 'Host',
+                      hint: 'localhost',
+                      controller: _hostController,
+                    ),
                     const SizedBox(height: 20),
                     GlassTextField(
                       label: 'Port',
@@ -177,7 +195,11 @@ class _ConnectionManagerScreenState extends ConsumerState<ConnectionManagerScree
                           color: AppTheme.secondaryColor,
                         ),
                         const SizedBox(width: 12),
-                        GlassButton(text: 'Save', icon: Icons.save, onPressed: _saveConnection),
+                        GlassButton(
+                          text: 'Save',
+                          icon: Icons.save,
+                          onPressed: _saveConnection,
+                        ),
                       ],
                     ),
                   ],
