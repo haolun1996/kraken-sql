@@ -11,9 +11,9 @@ class ConnectionModel {
     required this.id,
     required this.name,
     required this.host,
-    this.port = 3306,
     required this.username,
     required this.password,
+    this.port = 3306,
     this.database,
   });
 

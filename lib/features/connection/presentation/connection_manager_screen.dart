@@ -17,7 +17,7 @@ class ConnectionManagerScreen extends ConsumerStatefulWidget {
 class _ConnectionManagerScreenState
     extends ConsumerState<ConnectionManagerScreen> {
   final _nameController = TextEditingController();
-  final _hostController = TextEditingController();
+  final _hostController = TextEditingController(text: 'localhost');
   final _portController = TextEditingController(text: '3306');
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -37,6 +37,14 @@ class _ConnectionManagerScreenState
   }
 
   Future<void> _testConnection() async {
+    final validationError = _validateLocalHost();
+    if (validationError != null) {
+      setState(() {
+        _testResult = validationError;
+      });
+      return;
+    }
+
     setState(() {
       _isTesting = true;
       _testResult = null;
@@ -49,9 +57,8 @@ class _ConnectionManagerScreenState
       port: int.tryParse(_portController.text) ?? 3306,
       username: _usernameController.text,
       password: _passwordController.text,
-      database: _databaseController.text.isEmpty
-          ? null
-          : _databaseController.text,
+      database:
+          _databaseController.text.isEmpty ? null : _databaseController.text,
     );
 
     try {
@@ -70,6 +77,14 @@ class _ConnectionManagerScreenState
   }
 
   void _saveConnection() {
+    final validationError = _validateLocalHost();
+    if (validationError != null) {
+      setState(() {
+        _testResult = validationError;
+      });
+      return;
+    }
+
     final model = ConnectionModel(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       name: _nameController.text,
@@ -77,13 +92,18 @@ class _ConnectionManagerScreenState
       port: int.tryParse(_portController.text) ?? 3306,
       username: _usernameController.text,
       password: _passwordController.text,
-      database: _databaseController.text.isEmpty
-          ? null
-          : _databaseController.text,
+      database:
+          _databaseController.text.isEmpty ? null : _databaseController.text,
     );
 
     ref.read(connectionProvider.notifier).addConnection(model);
     Navigator.pop(context);
+  }
+
+  String? _validateLocalHost() {
+    final host =
+        _hostController.text.isEmpty ? 'localhost' : _hostController.text;
+    return MySQLService.validateLocalHost(host);
   }
 
   @override
@@ -122,12 +142,12 @@ class _ConnectionManagerScreenState
                               style: Theme.of(
                                 context,
                               ).textTheme.headlineSmall?.copyWith(
-                                fontWeight: FontWeight.w800,
-                              ),
+                                    fontWeight: FontWeight.w800,
+                                  ),
                             ),
                             const SizedBox(height: 4),
                             const Text(
-                              'Create a clean connection profile.',
+                              'Create a clean local MySQL connection profile.',
                               style: TextStyle(color: AppTheme.mutedTextColor),
                             ),
                           ],
@@ -162,6 +182,12 @@ class _ConnectionManagerScreenState
                         ),
                       ],
                     ),
+                    const SizedBox(height: 6),
+                    const Text(
+                      'Local hosts only: localhost, 127.0.0.1, or ::1',
+                      style: TextStyle(
+                          color: AppTheme.mutedTextColor, fontSize: 12),
+                    ),
                     const SizedBox(height: 20),
                     Row(
                       children: [
@@ -195,25 +221,22 @@ class _ConnectionManagerScreenState
                         width: double.infinity,
                         padding: const EdgeInsets.all(14),
                         decoration: BoxDecoration(
-                          color:
-                              hasSuccess
-                                  ? const Color(0xFF112219)
-                                  : const Color(0xFF241414),
+                          color: hasSuccess
+                              ? const Color(0xFF112219)
+                              : const Color(0xFF241414),
                           borderRadius: BorderRadius.circular(14),
                           border: Border.all(
-                            color:
-                                hasSuccess
-                                    ? AppTheme.successColor
-                                    : AppTheme.errorColor,
+                            color: hasSuccess
+                                ? AppTheme.successColor
+                                : AppTheme.errorColor,
                           ),
                         ),
                         child: Text(
                           _testResult!,
                           style: TextStyle(
-                            color:
-                                hasSuccess
-                                    ? AppTheme.successColor
-                                    : AppTheme.errorColor,
+                            color: hasSuccess
+                                ? AppTheme.successColor
+                                : AppTheme.errorColor,
                             fontWeight: FontWeight.w600,
                           ),
                         ),

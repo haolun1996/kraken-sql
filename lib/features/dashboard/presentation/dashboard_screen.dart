@@ -71,7 +71,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     }
 
     return Scaffold(
-      body: Container(
+      body: DecoratedBox(
         decoration: AppTheme.appBackgroundDecoration,
         child: SafeArea(
           child: Padding(
@@ -89,7 +89,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                       children: [
                         Text(
                           'SQLBench',
-                          style: Theme.of(context).textTheme.headlineMedium
+                          style: Theme.of(context)
+                              .textTheme
+                              .headlineMedium
                               ?.copyWith(fontWeight: FontWeight.w800),
                         ),
                         const SizedBox(height: 8),
@@ -119,7 +121,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                     children: [
                       if (_openConnections.isNotEmpty)
                         SizedBox(
-                          height: 56,
+                          height: 50,
                           child: ListView(
                             scrollDirection: Axis.horizontal,
                             children: [
@@ -127,11 +129,12 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                                 icon: Icons.home_rounded,
                                 label: 'Home',
                                 isSelected: _activeConnectionIndex == null,
-                                onTap: () =>
-                                    setState(() => _activeConnectionIndex = null),
+                                onTap: () => setState(
+                                    () => _activeConnectionIndex = null),
                               ),
                               const SizedBox(width: 8),
-                              ...List.generate(_openConnections.length, (index) {
+                              ...List.generate(_openConnections.length,
+                                  (index) {
                                 return Padding(
                                   padding: const EdgeInsets.only(right: 8),
                                   child: _TopTab(
@@ -150,7 +153,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                         )
                       else
                         Container(
-                          height: 72,
+                          height: 64,
                           width: double.infinity,
                           padding: const EdgeInsets.symmetric(horizontal: 24),
                           decoration: AppTheme.panelDecoration(elevated: true),
@@ -160,7 +163,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                                 _selectedIndex == 0
                                     ? 'Dashboard'
                                     : 'Connections',
-                                style: Theme.of(context).textTheme.titleLarge
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleLarge
                                     ?.copyWith(fontWeight: FontWeight.w700),
                               ),
                             ],
@@ -239,8 +244,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   'Focused database work, minus the visual noise.',
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.w700,
-                  ),
+                        fontWeight: FontWeight.w700,
+                      ),
                 ),
                 const SizedBox(height: 12),
                 const Text(
@@ -294,46 +299,44 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         ),
         const SizedBox(height: 24),
         Expanded(
-          child:
-              connections.isEmpty
-                  ? const Center(
-                    child: Text(
-                      'No connections yet',
-                      style: TextStyle(color: AppTheme.mutedTextColor),
-                    ),
-                  )
-                  : GridView.builder(
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          crossAxisSpacing: 16,
-                          mainAxisSpacing: 16,
-                          childAspectRatio: 3.2,
-                        ),
-                    itemCount: connections.length,
-                    itemBuilder: (context, index) {
-                      final conn = connections[index];
-                      final isActive = _openConnections.any(
-                        (c) => c.id == conn.id,
-                      );
-                      return _ConnectionCard(
-                        connection: conn,
-                        isActive: isActive,
-                        onConnect: () => _openConnection(conn),
-                        onDelete: () {
-                          ref
-                              .read(connectionProvider.notifier)
-                              .removeConnection(conn.id);
-                          final openIndex = _openConnections.indexWhere(
-                            (c) => c.id == conn.id,
-                          );
-                          if (openIndex != -1) {
-                            _closeConnection(openIndex);
-                          }
-                        },
-                      );
-                    },
+          child: connections.isEmpty
+              ? const Center(
+                  child: Text(
+                    'No connections yet',
+                    style: TextStyle(color: AppTheme.mutedTextColor),
                   ),
+                )
+              : GridView.builder(
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 16,
+                    mainAxisSpacing: 16,
+                    childAspectRatio: 3.2,
+                  ),
+                  itemCount: connections.length,
+                  itemBuilder: (context, index) {
+                    final conn = connections[index];
+                    final isActive = _openConnections.any(
+                      (c) => c.id == conn.id,
+                    );
+                    return _ConnectionCard(
+                      connection: conn,
+                      isActive: isActive,
+                      onConnect: () => _openConnection(conn),
+                      onDelete: () {
+                        ref
+                            .read(connectionProvider.notifier)
+                            .removeConnection(conn.id);
+                        final openIndex = _openConnections.indexWhere(
+                          (c) => c.id == conn.id,
+                        );
+                        if (openIndex != -1) {
+                          _closeConnection(openIndex);
+                        }
+                      },
+                    );
+                  },
+                ),
         ),
       ],
     );
@@ -365,33 +368,29 @@ class _SidebarItem extends StatelessWidget {
           borderRadius: BorderRadius.circular(14),
           child: Container(
             padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-            decoration:
-                isSelected
-                    ? BoxDecoration(
-                      borderRadius: BorderRadius.circular(14),
-                      border: Border.all(color: AppTheme.borderColor),
-                    )
-                    : null,
+            decoration: isSelected
+                ? BoxDecoration(
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: AppTheme.borderColor),
+                  )
+                : null,
             child: Row(
               children: [
                 Icon(
                   icon,
-                  color:
-                      isSelected
-                          ? AppTheme.primaryColor
-                          : AppTheme.mutedTextColor,
+                  color: isSelected
+                      ? AppTheme.primaryColor
+                      : AppTheme.mutedTextColor,
                   size: 20,
                 ),
                 const SizedBox(width: 12),
                 Text(
                   label,
                   style: TextStyle(
-                    color:
-                        isSelected
-                            ? AppTheme.primaryColor
-                            : AppTheme.mutedTextColor,
-                    fontWeight:
-                        isSelected ? FontWeight.w700 : FontWeight.w500,
+                    color: isSelected
+                        ? AppTheme.primaryColor
+                        : AppTheme.mutedTextColor,
+                    fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                   ),
                 ),
               ],
@@ -431,7 +430,8 @@ class _TopTab extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: isSelected ? AppTheme.secondaryColor : AppTheme.borderColor,
+              color:
+                  isSelected ? AppTheme.secondaryColor : AppTheme.borderColor,
             ),
           ),
           child: Row(
@@ -440,19 +440,17 @@ class _TopTab extends StatelessWidget {
               Icon(
                 icon,
                 size: 16,
-                color:
-                    isSelected
-                        ? AppTheme.primaryColor
-                        : AppTheme.mutedTextColor,
+                color: isSelected
+                    ? AppTheme.primaryColor
+                    : AppTheme.mutedTextColor,
               ),
               const SizedBox(width: 8),
               Text(
                 label,
                 style: TextStyle(
-                  color:
-                      isSelected
-                          ? AppTheme.primaryColor
-                          : AppTheme.mutedTextColor,
+                  color: isSelected
+                      ? AppTheme.primaryColor
+                      : AppTheme.mutedTextColor,
                   fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                 ),
               ),
@@ -596,14 +594,14 @@ class _ConnectionCard extends StatelessWidget {
             text: isActive ? 'Open' : 'Connect',
             icon: isActive ? Icons.open_in_new_rounded : Icons.link_rounded,
             onPressed: onConnect,
-            color:
-                isActive
-                    ? AppTheme.secondaryColor
-                    : AppTheme.elevatedSurfaceColor,
+            color: isActive
+                ? AppTheme.secondaryColor
+                : AppTheme.elevatedSurfaceColor,
           ),
           const SizedBox(width: 8),
           IconButton(
-            icon: const Icon(Icons.delete_outline, color: AppTheme.mutedTextColor),
+            icon: const Icon(Icons.delete_outline,
+                color: AppTheme.mutedTextColor),
             onPressed: onDelete,
           ),
         ],
