@@ -71,193 +71,77 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     }
 
     return Scaffold(
-      extendBodyBehindAppBar: true,
       body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [Color(0xFF323232), Color(0xFF545454), Color(0xFF656565)],
-          ),
-        ),
+        decoration: AppTheme.appBackgroundDecoration,
         child: SafeArea(
-          child: Row(
-            children: [
-              // Sidebar
-              if (_activeConnectionIndex == null)
-                Container(
-                  width: 250,
-                  height: double.infinity,
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(16),
-                    color: Colors.white.withOpacity(0.1),
-                    border: Border.all(color: Colors.white.withOpacity(0.1)),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              children: [
+                if (_activeConnectionIndex == null)
+                  Container(
+                    width: 250,
+                    height: double.infinity,
+                    padding: const EdgeInsets.all(20),
+                    decoration: AppTheme.panelDecoration(elevated: true),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'SQLBench',
+                          style: Theme.of(context).textTheme.headlineMedium
+                              ?.copyWith(fontWeight: FontWeight.w800),
+                        ),
+                        const SizedBox(height: 8),
+                        const Text(
+                          'Minimal SQL workspace',
+                          style: TextStyle(color: AppTheme.mutedTextColor),
+                        ),
+                        const SizedBox(height: 40),
+                        _SidebarItem(
+                          icon: Icons.dashboard_rounded,
+                          label: 'Dashboard',
+                          isSelected: _selectedIndex == 0,
+                          onTap: () => setState(() => _selectedIndex = 0),
+                        ),
+                        _SidebarItem(
+                          icon: Icons.storage_rounded,
+                          label: 'Connections',
+                          isSelected: _selectedIndex == 1,
+                          onTap: () => setState(() => _selectedIndex = 1),
+                        ),
+                      ],
+                    ),
                   ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'SQLBench',
-                        style: Theme.of(context).textTheme.headlineMedium
-                            ?.copyWith(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
-                      ),
-                      const SizedBox(height: 40),
-                      _SidebarItem(
-                        icon: Icons.dashboard_rounded,
-                        label: 'Dashboard',
-                        isSelected: _selectedIndex == 0,
-                        onTap: () => setState(() => _selectedIndex = 0),
-                      ),
-                      _SidebarItem(
-                        icon: Icons.storage_rounded,
-                        label: 'Connections',
-                        isSelected: _selectedIndex == 1,
-                        onTap: () => setState(() => _selectedIndex = 1),
-                      ),
-                    ],
-                  ),
-                ),
-
-              // Main Content
-              Expanded(
-                child: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(
-                        vertical: 16.0,
-                        horizontal: 0,
-                      ).copyWith(
-                        right: 16.0,
-                        left: _activeConnectionIndex != null ? 16.0 : 0,
-                      ),
+                if (_activeConnectionIndex == null) const SizedBox(width: 16),
+                Expanded(
                   child: Column(
                     children: [
-                      // Top Bar / Tabs
                       if (_openConnections.isNotEmpty)
-                        Container(
-                          height: 50,
-                          margin: const EdgeInsets.only(bottom: 16),
+                        SizedBox(
+                          height: 56,
                           child: ListView(
                             scrollDirection: Axis.horizontal,
                             children: [
-                              // Home Button
-                              GestureDetector(
-                                onTap: () => setState(
-                                  () => _activeConnectionIndex = null,
-                                ),
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 16,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(16),
-                                    gradient: _activeConnectionIndex == null
-                                        ? LinearGradient(
-                                            colors: [
-                                              AppTheme.primaryColor.withOpacity(
-                                                0.5,
-                                              ),
-                                              AppTheme.primaryColor.withOpacity(
-                                                0.5,
-                                              ),
-                                            ],
-                                          )
-                                        : const LinearGradient(
-                                            colors: [
-                                              Colors.transparent,
-                                              Colors.transparent,
-                                            ],
-                                          ),
-                                    border: Border.all(
-                                      color: Colors.white.withOpacity(0.1),
-                                    ),
-                                  ),
-                                  child: Icon(
-                                    Icons.home_rounded,
-                                    color: _activeConnectionIndex == null
-                                        ? Colors.white
-                                        : Colors.white60,
-                                  ),
-                                ),
+                              _TopTab(
+                                icon: Icons.home_rounded,
+                                label: 'Home',
+                                isSelected: _activeConnectionIndex == null,
+                                onTap: () =>
+                                    setState(() => _activeConnectionIndex = null),
                               ),
                               const SizedBox(width: 8),
-                              // Connection Tabs
-                              ...List.generate(_openConnections.length, (
-                                index,
-                              ) {
-                                final isSelected =
-                                    _activeConnectionIndex == index;
+                              ...List.generate(_openConnections.length, (index) {
                                 return Padding(
                                   padding: const EdgeInsets.only(right: 8),
-                                  child: GestureDetector(
+                                  child: _TopTab(
+                                    icon: Icons.storage_rounded,
+                                    label: _openConnections[index].name,
+                                    isSelected: _activeConnectionIndex == index,
                                     onTap: () => setState(
                                       () => _activeConnectionIndex = index,
                                     ),
-                                    child: Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 16,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(16),
-                                        gradient: isSelected
-                                            ? LinearGradient(
-                                                colors: [
-                                                  AppTheme.primaryColor
-                                                      .withOpacity(0.5),
-                                                  AppTheme.primaryColor
-                                                      .withOpacity(0.5),
-                                                ],
-                                              )
-                                            : const LinearGradient(
-                                                colors: [
-                                                  Colors.transparent,
-                                                  Colors.transparent,
-                                                ],
-                                              ),
-                                        border: Border.all(
-                                          color: Colors.white.withOpacity(0.1),
-                                        ),
-                                      ),
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Icon(
-                                            Icons.storage_rounded,
-                                            size: 16,
-                                            color: isSelected
-                                                ? Colors.white
-                                                : Colors.white60,
-                                          ),
-                                          const SizedBox(width: 8),
-                                          Text(
-                                            _openConnections[index].name,
-                                            style: TextStyle(
-                                              color: isSelected
-                                                  ? Colors.white
-                                                  : Colors.white60,
-                                              fontWeight: isSelected
-                                                  ? FontWeight.bold
-                                                  : FontWeight.normal,
-                                            ),
-                                          ),
-                                          const SizedBox(width: 8),
-                                          GestureDetector(
-                                            onTap: () =>
-                                                _closeConnection(index),
-                                            child: Icon(
-                                              Icons.close_rounded,
-                                              size: 14,
-                                              color: isSelected
-                                                  ? Colors.white
-                                                  : Colors.white60,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
+                                    onClose: () => _closeConnection(index),
                                   ),
                                 );
                               }),
@@ -266,16 +150,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                         )
                       else
                         Container(
-                          height: 80,
+                          height: 72,
                           width: double.infinity,
                           padding: const EdgeInsets.symmetric(horizontal: 24),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(16),
-                            color: Colors.white.withOpacity(0.1),
-                            border: Border.all(
-                              color: Colors.white.withOpacity(0.1),
-                            ),
-                          ),
+                          decoration: AppTheme.panelDecoration(elevated: true),
                           child: Row(
                             children: [
                               Text(
@@ -283,38 +161,25 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                                     ? 'Dashboard'
                                     : 'Connections',
                                 style: Theme.of(context).textTheme.titleLarge
-                                    ?.copyWith(color: Colors.white),
+                                    ?.copyWith(fontWeight: FontWeight.w700),
                               ),
-                              const Spacer(),
                             ],
                           ),
                         ),
-
-                      if (_openConnections.isNotEmpty)
-                        const SizedBox(height: 0)
-                      else
-                        const SizedBox(height: 16),
-
-                      // Content Area
+                      const SizedBox(height: 16),
                       Expanded(
                         child: Container(
                           width: double.infinity,
                           padding: const EdgeInsets.all(24),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(16),
-                            color: Colors.white.withOpacity(0.1),
-                            border: Border.all(
-                              color: Colors.white.withOpacity(0.1),
-                            ),
-                          ),
+                          decoration: AppTheme.panelDecoration(elevated: true),
                           child: content,
                         ),
                       ),
                     ],
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -326,11 +191,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Quick Stats',
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-          ),
+          'Overview',
+          style: Theme.of(
+            context,
+          ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
         ),
         const SizedBox(height: 24),
         Row(
@@ -339,52 +203,68 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               icon: Icons.storage_rounded,
               title: 'Connections',
               value: connections.length.toString(),
-              color: AppTheme.primaryColor,
+              color: AppTheme.secondaryColor,
             ),
             const SizedBox(width: 16),
             _StatCard(
               icon: Icons.code_rounded,
-              title: 'Open',
+              title: 'Open Sessions',
               value: _openConnections.length.toString(),
-              color: AppTheme.secondaryColor,
+              color: AppTheme.primaryColor,
             ),
           ],
         ),
-        const SizedBox(height: 40),
+        const Spacer(),
         Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.rocket_launch_rounded,
-                size: 64,
-                color: AppTheme.secondaryColor.withOpacity(0.8),
-              ),
-              const SizedBox(height: 20),
-              Text(
-                'Welcome to SQLBench',
-                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                  color: Colors.white.withOpacity(0.9),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 460),
+            child: Column(
+              children: [
+                Container(
+                  width: 84,
+                  height: 84,
+                  decoration: BoxDecoration(
+                    color: AppTheme.elevatedSurfaceColor,
+                    borderRadius: BorderRadius.circular(24),
+                    border: Border.all(color: AppTheme.borderColor),
+                  ),
+                  child: const Icon(
+                    Icons.terminal_rounded,
+                    size: 38,
+                    color: AppTheme.secondaryColor,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 10),
-              Text(
-                'Create a connection to get started',
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  color: Colors.white.withOpacity(0.6),
+                const SizedBox(height: 24),
+                Text(
+                  'Focused database work, minus the visual noise.',
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 24),
-              GlassButton(
-                text: 'New Connection',
-                icon: Icons.add,
-                onPressed: () async {
-                  await ConnectionDialog.show(context, ref);
-                },
-              ),
-            ],
+                const SizedBox(height: 12),
+                const Text(
+                  'Create a connection and jump straight into queries with a quieter dark workspace.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: AppTheme.mutedTextColor,
+                    height: 1.5,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                GlassButton(
+                  text: 'New Connection',
+                  icon: Icons.add_rounded,
+                  onPressed: () async {
+                    await ConnectionDialog.show(context, ref);
+                  },
+                  color: AppTheme.secondaryColor,
+                ),
+              ],
+            ),
           ),
         ),
+        const Spacer(),
       ],
     );
   }
@@ -397,61 +277,63 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           children: [
             Text(
               'Saved Connections',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
             ),
             const Spacer(),
             GlassButton(
               text: 'New',
-              icon: Icons.add,
+              icon: Icons.add_rounded,
               onPressed: () async {
                 await ConnectionDialog.show(context, ref);
               },
+              color: AppTheme.secondaryColor,
             ),
           ],
         ),
         const SizedBox(height: 24),
         Expanded(
-          child: connections.isEmpty
-              ? Center(
-                  child: Text(
-                    'No connections yet',
-                    style: TextStyle(color: Colors.white.withOpacity(0.5)),
+          child:
+              connections.isEmpty
+                  ? const Center(
+                    child: Text(
+                      'No connections yet',
+                      style: TextStyle(color: AppTheme.mutedTextColor),
+                    ),
+                  )
+                  : GridView.builder(
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 16,
+                          mainAxisSpacing: 16,
+                          childAspectRatio: 3.2,
+                        ),
+                    itemCount: connections.length,
+                    itemBuilder: (context, index) {
+                      final conn = connections[index];
+                      final isActive = _openConnections.any(
+                        (c) => c.id == conn.id,
+                      );
+                      return _ConnectionCard(
+                        connection: conn,
+                        isActive: isActive,
+                        onConnect: () => _openConnection(conn),
+                        onDelete: () {
+                          ref
+                              .read(connectionProvider.notifier)
+                              .removeConnection(conn.id);
+                          final openIndex = _openConnections.indexWhere(
+                            (c) => c.id == conn.id,
+                          );
+                          if (openIndex != -1) {
+                            _closeConnection(openIndex);
+                          }
+                        },
+                      );
+                    },
                   ),
-                )
-              : GridView.builder(
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 16,
-                    mainAxisSpacing: 16,
-                    childAspectRatio: 3.5,
-                  ),
-                  itemCount: connections.length,
-                  itemBuilder: (context, index) {
-                    final conn = connections[index];
-                    final isActive = _openConnections.any(
-                      (c) => c.id == conn.id,
-                    );
-                    return _ConnectionCard(
-                      connection: conn,
-                      isActive: isActive,
-                      onConnect: () => _openConnection(conn),
-                      onDelete: () {
-                        ref
-                            .read(connectionProvider.notifier)
-                            .removeConnection(conn.id);
-                        final openIndex = _openConnections.indexWhere(
-                          (c) => c.id == conn.id,
-                        );
-                        if (openIndex != -1) {
-                          _closeConnection(openIndex);
-                        }
-                      },
-                    );
-                  },
-                ),
         ),
       ],
     );
@@ -467,44 +349,126 @@ class _SidebarItem extends StatelessWidget {
   const _SidebarItem({
     required this.icon,
     required this.label,
-    this.isSelected = false,
     required this.onTap,
+    this.isSelected = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 12),
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-        decoration: isSelected
-            ? BoxDecoration(
-                color: AppTheme.primaryColor.withOpacity(0.3),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: AppTheme.primaryColor.withOpacity(0.5),
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Material(
+        color: isSelected ? const Color(0xFF1C232B) : Colors.transparent,
+        borderRadius: BorderRadius.circular(14),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(14),
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+            decoration:
+                isSelected
+                    ? BoxDecoration(
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(color: AppTheme.borderColor),
+                    )
+                    : null,
+            child: Row(
+              children: [
+                Icon(
+                  icon,
+                  color:
+                      isSelected
+                          ? AppTheme.primaryColor
+                          : AppTheme.mutedTextColor,
+                  size: 20,
                 ),
-              )
-            : null,
-        child: Row(
-          children: [
-            Icon(
-              icon,
-              color: isSelected ? Colors.white : Colors.white.withOpacity(0.6),
-              size: 20,
+                const SizedBox(width: 12),
+                Text(
+                  label,
+                  style: TextStyle(
+                    color:
+                        isSelected
+                            ? AppTheme.primaryColor
+                            : AppTheme.mutedTextColor,
+                    fontWeight:
+                        isSelected ? FontWeight.w700 : FontWeight.w500,
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(width: 12),
-            Text(
-              label,
-              style: TextStyle(
-                color: isSelected
-                    ? Colors.white
-                    : Colors.white.withOpacity(0.6),
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _TopTab extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final bool isSelected;
+  final VoidCallback onTap;
+  final VoidCallback? onClose;
+
+  const _TopTab({
+    required this.icon,
+    required this.label,
+    required this.isSelected,
+    required this.onTap,
+    this.onClose,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: isSelected ? AppTheme.elevatedSurfaceColor : AppTheme.surfaceColor,
+      borderRadius: BorderRadius.circular(16),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: isSelected ? AppTheme.secondaryColor : AppTheme.borderColor,
+            ),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                icon,
+                size: 16,
+                color:
+                    isSelected
+                        ? AppTheme.primaryColor
+                        : AppTheme.mutedTextColor,
               ),
-            ),
-          ],
+              const SizedBox(width: 8),
+              Text(
+                label,
+                style: TextStyle(
+                  color:
+                      isSelected
+                          ? AppTheme.primaryColor
+                          : AppTheme.mutedTextColor,
+                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                ),
+              ),
+              if (onClose != null) ...[
+                const SizedBox(width: 8),
+                GestureDetector(
+                  onTap: onClose,
+                  child: const Icon(
+                    Icons.close_rounded,
+                    size: 14,
+                    color: AppTheme.mutedTextColor,
+                  ),
+                ),
+              ],
+            ],
+          ),
         ),
       ),
     );
@@ -529,24 +493,26 @@ class _StatCard extends StatelessWidget {
     return Expanded(
       child: Container(
         padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          gradient: LinearGradient(
-            colors: [color.withOpacity(0.2), color.withOpacity(0.05)],
-          ),
-          border: Border.all(color: Colors.white.withOpacity(0.1)),
-        ),
+        decoration: AppTheme.panelDecoration(),
         child: Row(
           children: [
-            Icon(icon, color: color, size: 32),
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: AppTheme.elevatedSurfaceColor,
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Icon(icon, color: color, size: 24),
+            ),
             const SizedBox(width: 16),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   title,
-                  style: TextStyle(
-                    color: Colors.white.withOpacity(0.7),
+                  style: const TextStyle(
+                    color: AppTheme.mutedTextColor,
                     fontSize: 12,
                   ),
                 ),
@@ -554,7 +520,7 @@ class _StatCard extends StatelessWidget {
                 Text(
                   value,
                   style: const TextStyle(
-                    color: Colors.white,
+                    color: AppTheme.primaryColor,
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
                   ),
@@ -584,35 +550,33 @@ class _ConnectionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        gradient: isActive
-            ? LinearGradient(
-                colors: [
-                  AppTheme.primaryColor.withOpacity(0.3),
-                  AppTheme.primaryColor.withOpacity(0.1),
-                ],
-              )
-            : null,
-        color: isActive ? null : Colors.white.withOpacity(0.05),
-        border: Border.all(color: Colors.white.withOpacity(0.1)),
-      ),
+      padding: const EdgeInsets.all(18),
+      decoration: AppTheme.panelDecoration(selected: isActive),
       child: Row(
         children: [
-          Icon(
-            Icons.storage_rounded,
-            color: isActive ? AppTheme.secondaryColor : Colors.white70,
+          Container(
+            width: 46,
+            height: 46,
+            decoration: BoxDecoration(
+              color: AppTheme.elevatedSurfaceColor,
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Icon(
+              Icons.storage_rounded,
+              color:
+                  isActive ? AppTheme.secondaryColor : AppTheme.mutedTextColor,
+            ),
           ),
           const SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
                   connection.name,
                   style: const TextStyle(
-                    color: Colors.white,
+                    color: AppTheme.primaryColor,
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
                   ),
@@ -620,25 +584,26 @@ class _ConnectionCard extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   '${connection.host}:${connection.port}',
-                  style: TextStyle(
-                    color: Colors.white.withOpacity(0.6),
+                  style: const TextStyle(
+                    color: AppTheme.mutedTextColor,
                     fontSize: 12,
                   ),
                 ),
               ],
             ),
           ),
-          if (!isActive)
-            GlassButton(text: 'Connect', icon: Icons.link, onPressed: onConnect)
-          else
-            GlassButton(
-              text: 'Open',
-              icon: Icons.open_in_new,
-              onPressed: onConnect,
-            ),
+          GlassButton(
+            text: isActive ? 'Open' : 'Connect',
+            icon: isActive ? Icons.open_in_new_rounded : Icons.link_rounded,
+            onPressed: onConnect,
+            color:
+                isActive
+                    ? AppTheme.secondaryColor
+                    : AppTheme.elevatedSurfaceColor,
+          ),
           const SizedBox(width: 8),
           IconButton(
-            icon: const Icon(Icons.delete_outline, color: Colors.white54),
+            icon: const Icon(Icons.delete_outline, color: AppTheme.mutedTextColor),
             onPressed: onDelete,
           ),
         ],

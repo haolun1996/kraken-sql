@@ -9,55 +9,63 @@ class GlassButton extends StatelessWidget {
   final bool isLoading;
 
   const GlassButton({
-    super.key,
     required this.text,
+    this.isLoading = false,
     this.onPressed,
     this.icon,
     this.color,
-    this.isLoading = false,
+    super.key,
   });
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: isLoading ? null : onPressed,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              (color ?? AppTheme.primaryColor).withOpacity(0.3),
-              (color ?? AppTheme.primaryColor).withOpacity(0.1),
+    final backgroundColor = color ?? AppTheme.primaryColor;
+    final foregroundColor =
+        backgroundColor.computeLuminance() > 0.45
+            ? AppTheme.backgroundColor
+            : Colors.white;
+
+    return Material(
+      color: backgroundColor,
+      borderRadius: BorderRadius.circular(14),
+      child: InkWell(
+        onTap: isLoading ? null : onPressed,
+        borderRadius: BorderRadius.circular(14),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(
+              color:
+                  backgroundColor == AppTheme.primaryColor
+                      ? AppTheme.borderColor
+                      : backgroundColor,
+            ),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (isLoading)
+                SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: foregroundColor,
+                  ),
+                )
+              else if (icon != null)
+                Icon(icon, color: foregroundColor, size: 18),
+              if (icon != null || isLoading) const SizedBox(width: 8),
+              Text(
+                text,
+                style: TextStyle(
+                  color: foregroundColor,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
             ],
           ),
-          border: Border.all(color: Colors.white.withOpacity(0.1)),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (isLoading)
-              const SizedBox(
-                width: 16,
-                height: 16,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: Colors.white,
-                ),
-              )
-            else if (icon != null)
-              Icon(icon, color: Colors.white, size: 18),
-            if (icon != null || isLoading) const SizedBox(width: 8),
-            Text(
-              text,
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ],
         ),
       ),
     );

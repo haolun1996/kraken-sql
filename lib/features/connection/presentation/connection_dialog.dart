@@ -10,7 +10,7 @@ class ConnectionDialog {
   static Future<void> show(BuildContext context, WidgetRef ref) {
     return showDialog(
       context: context,
-      barrierColor: Colors.black54,
+      barrierColor: const Color(0xCC050607),
       builder: (context) => const _ConnectionDialogContent(),
     );
   }
@@ -69,12 +69,12 @@ class _ConnectionDialogContentState
       await conn.close();
       setState(() {
         _isTesting = false;
-        _testResult = '✓ Connection successful!';
+        _testResult = 'Connection successful';
       });
     } catch (e) {
       setState(() {
         _isTesting = false;
-        _testResult = '✗ ${e.toString().replaceAll('Exception: ', '')}';
+        _testResult = e.toString().replaceAll('Exception: ', '');
       });
     }
   }
@@ -100,23 +100,15 @@ class _ConnectionDialogContentState
 
   @override
   Widget build(BuildContext context) {
+    final hasSuccess = _testResult == 'Connection successful';
+
     return Dialog(
-      backgroundColor: Colors.transparent,
+      backgroundColor: AppTheme.surfaceColor,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
       child: Container(
-        width: 500,
-        padding: const EdgeInsets.all(32),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          color: const Color(0xFF2C2C2C), // Solid dark background for dialog
-          border: Border.all(color: Colors.white.withOpacity(0.1)),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.3),
-              blurRadius: 20,
-              spreadRadius: 5,
-            ),
-          ],
-        ),
+        width: 520,
+        padding: const EdgeInsets.all(28),
+        decoration: AppTheme.panelDecoration(elevated: true),
         child: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -124,16 +116,25 @@ class _ConnectionDialogContentState
             children: [
               Row(
                 children: [
-                  Text(
-                    'New Connection',
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'New Connection',
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      const Text(
+                        'Store a database profile for quick access.',
+                        style: TextStyle(color: AppTheme.mutedTextColor),
+                      ),
+                    ],
                   ),
                   const Spacer(),
                   IconButton(
-                    icon: const Icon(Icons.close, color: Colors.white70),
+                    icon: const Icon(Icons.close, color: AppTheme.mutedTextColor),
                     onPressed: () => Navigator.pop(context),
                   ),
                 ],
@@ -151,17 +152,25 @@ class _ConnectionDialogContentState
                 controller: _hostController,
               ),
               const SizedBox(height: 16),
-              GlassTextField(
-                label: 'Port',
-                hint: '3306',
-                controller: _portController,
-                keyboardType: TextInputType.number,
-              ),
-              const SizedBox(height: 16),
-              GlassTextField(
-                label: 'Username',
-                hint: 'root',
-                controller: _usernameController,
+              Row(
+                children: [
+                  Expanded(
+                    child: GlassTextField(
+                      label: 'Port',
+                      hint: '3306',
+                      controller: _portController,
+                      keyboardType: TextInputType.number,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: GlassTextField(
+                      label: 'Username',
+                      hint: 'root',
+                      controller: _usernameController,
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: 16),
               GlassTextField(
@@ -176,20 +185,37 @@ class _ConnectionDialogContentState
                 hint: 'my_database',
                 controller: _databaseController,
               ),
-              const SizedBox(height: 20),
-              if (_testResult != null)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 16),
+              if (_testResult != null) ...[
+                const SizedBox(height: 20),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color:
+                        hasSuccess
+                            ? const Color(0xFF112219)
+                            : const Color(0xFF241414),
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(
+                      color:
+                          hasSuccess
+                              ? AppTheme.successColor
+                              : AppTheme.errorColor,
+                    ),
+                  ),
                   child: Text(
                     _testResult!,
                     style: TextStyle(
-                      color: _testResult!.contains('✓')
-                          ? Colors.greenAccent
-                          : Colors.redAccent,
+                      color:
+                          hasSuccess
+                              ? AppTheme.successColor
+                              : AppTheme.errorColor,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
                 ),
+              ],
+              const SizedBox(height: 24),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
@@ -198,13 +224,14 @@ class _ConnectionDialogContentState
                     icon: Icons.check_circle_outline,
                     onPressed: _testConnection,
                     isLoading: _isTesting,
-                    color: AppTheme.secondaryColor,
+                    color: AppTheme.elevatedSurfaceColor,
                   ),
                   const SizedBox(width: 12),
                   GlassButton(
                     text: 'Save',
-                    icon: Icons.save,
+                    icon: Icons.save_rounded,
                     onPressed: _saveConnection,
+                    color: AppTheme.secondaryColor,
                   ),
                 ],
               ),

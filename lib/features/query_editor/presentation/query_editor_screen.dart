@@ -11,7 +11,7 @@ import 'package:sqlbench/ui/widgets/glass_button.dart';
 class QueryEditorScreen extends ConsumerStatefulWidget {
   final ConnectionModel connection;
 
-  const QueryEditorScreen({super.key, required this.connection});
+  const QueryEditorScreen({required this.connection, super.key});
 
   @override
   ConsumerState<QueryEditorScreen> createState() => _QueryEditorScreenState();
@@ -28,12 +28,10 @@ class _QueryEditorScreenState extends ConsumerState<QueryEditorScreen> {
   List<String> _tables = [];
   String? _selectedDatabase;
 
-  // Autocomplete state
   List<String> _suggestions = [];
   int _selectedSuggestionIndex = 0;
   bool _showAutocomplete = false;
 
-  // SQL keywords
   static const List<String> _sqlKeywords = [
     'SELECT',
     'FROM',
@@ -101,7 +99,6 @@ class _QueryEditorScreenState extends ConsumerState<QueryEditorScreen> {
 
     if (cursorPos < 0) return;
 
-    // Get the word being typed
     final textBeforeCursor = text.substring(0, cursorPos);
     final words = textBeforeCursor.split(RegExp(r'[\s,()]'));
     final currentWord = words.isNotEmpty ? words.last : '';
@@ -114,17 +111,14 @@ class _QueryEditorScreenState extends ConsumerState<QueryEditorScreen> {
       return;
     }
 
-    // Find matching suggestions
     List<String> matches = [];
 
-    // Add SQL keyword matches
     matches.addAll(
       _sqlKeywords.where(
         (kw) => kw.toLowerCase().startsWith(currentWord.toLowerCase()),
       ),
     );
 
-    // Add table name matches if we have a selected database
     if (_selectedDatabase != null && _tables.isNotEmpty) {
       matches.addAll(
         _tables.where(
@@ -146,7 +140,6 @@ class _QueryEditorScreenState extends ConsumerState<QueryEditorScreen> {
 
     if (cursorPos < 0) return;
 
-    // Get the word being typed
     final textBeforeCursor = text.substring(0, cursorPos);
     final words = textBeforeCursor.split(RegExp(r'[\s,()]'));
     final currentWord = words.isNotEmpty ? words.last : '';
@@ -172,7 +165,6 @@ class _QueryEditorScreenState extends ConsumerState<QueryEditorScreen> {
 
   bool _handleKeyEvent(KeyEvent event) {
     if (event is KeyDownEvent) {
-      // Cmd+Enter to execute query
       if (event.logicalKey == LogicalKeyboardKey.enter &&
           HardwareKeyboard.instance.isMetaPressed) {
         _executeQuery();
@@ -189,20 +181,23 @@ class _QueryEditorScreenState extends ConsumerState<QueryEditorScreen> {
               (_selectedSuggestionIndex + 1) % _suggestions.length;
         });
         return true;
-      } else if (event.logicalKey == LogicalKeyboardKey.arrowUp) {
+      }
+      if (event.logicalKey == LogicalKeyboardKey.arrowUp) {
         setState(() {
           _selectedSuggestionIndex =
               (_selectedSuggestionIndex - 1 + _suggestions.length) %
               _suggestions.length;
         });
         return true;
-      } else if (event.logicalKey == LogicalKeyboardKey.enter ||
+      }
+      if (event.logicalKey == LogicalKeyboardKey.enter ||
           event.logicalKey == LogicalKeyboardKey.tab) {
         if (_suggestions.isNotEmpty) {
           _insertSuggestion(_suggestions[_selectedSuggestionIndex]);
           return true;
         }
-      } else if (event.logicalKey == LogicalKeyboardKey.escape) {
+      }
+      if (event.logicalKey == LogicalKeyboardKey.escape) {
         setState(() {
           _showAutocomplete = false;
           _suggestions = [];
@@ -286,51 +281,55 @@ class _QueryEditorScreenState extends ConsumerState<QueryEditorScreen> {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        // Database Browser Sidebar
         Container(
-          width: 250,
+          width: 260,
           height: double.infinity,
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.05),
-            border: Border(
-              right: BorderSide(color: Colors.white.withOpacity(0.1)),
-            ),
+            color: AppTheme.sidebarColor,
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: AppTheme.borderColor),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 'Databases',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: Theme.of(
+                  context,
+                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                'Double click to load tables',
+                style: TextStyle(color: AppTheme.mutedTextColor, fontSize: 12),
               ),
               const SizedBox(height: 16),
               Expanded(
-                child: _databases.isEmpty
-                    ? const Center(child: CircularProgressIndicator())
-                    : ListView.builder(
-                        itemCount: _databases.length,
-                        itemBuilder: (context, index) {
-                          final db = _databases[index];
-                          return _DatabaseItem(
-                            name: db,
-                            isSelected: _selectedDatabase == db,
-                            onDoubleTap: () => _loadTables(db),
-                          );
-                        },
-                      ),
+                child:
+                    _databases.isEmpty
+                        ? const Center(child: CircularProgressIndicator())
+                        : ListView.builder(
+                          itemCount: _databases.length,
+                          itemBuilder: (context, index) {
+                            final db = _databases[index];
+                            return _DatabaseItem(
+                              name: db,
+                              isSelected: _selectedDatabase == db,
+                              onDoubleTap: () => _loadTables(db),
+                            );
+                          },
+                        ),
               ),
               if (_selectedDatabase != null) ...[
-                const Divider(color: Colors.white24),
-                const SizedBox(height: 8),
+                const SizedBox(height: 12),
+                const Divider(color: AppTheme.borderColor),
+                const SizedBox(height: 12),
                 Text(
                   'Tables',
                   style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    color: Colors.white70,
-                    fontWeight: FontWeight.bold,
+                    color: AppTheme.mutedTextColor,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -353,49 +352,58 @@ class _QueryEditorScreenState extends ConsumerState<QueryEditorScreen> {
             ],
           ),
         ),
-        // Query Editor
+        const SizedBox(width: 16),
         Expanded(
           child: Column(
             children: [
-              // Query Input with autocomplete
               Stack(
                 children: [
                   Container(
-                    height: 200,
                     width: double.infinity,
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.05),
-                      border: Border(
-                        bottom: BorderSide(
-                          color: Colors.white.withOpacity(0.1),
-                        ),
-                      ),
-                    ),
+                    padding: const EdgeInsets.all(18),
+                    decoration: AppTheme.panelDecoration(),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Row(
                           children: [
-                            Text(
-                              'Query Editor',
-                              style: Theme.of(context).textTheme.titleMedium
-                                  ?.copyWith(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  widget.connection.name,
+                                  style: Theme.of(context).textTheme.titleMedium
+                                      ?.copyWith(fontWeight: FontWeight.w800),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  '${widget.connection.host}:${widget.connection.port}',
+                                  style: const TextStyle(
+                                    color: AppTheme.mutedTextColor,
+                                    fontSize: 12,
                                   ),
+                                ),
+                              ],
                             ),
                             const Spacer(),
                             GlassButton(
                               text: 'Execute',
-                              icon: Icons.play_arrow,
+                              icon: Icons.play_arrow_rounded,
                               onPressed: _executeQuery,
                               isLoading: _isExecuting,
+                              color: AppTheme.secondaryColor,
                             ),
                           ],
                         ),
-                        const SizedBox(height: 12),
-                        Expanded(
+                        const SizedBox(height: 16),
+                        Container(
+                          constraints: const BoxConstraints(minHeight: 220),
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: AppTheme.backgroundColor,
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(color: AppTheme.borderColor),
+                          ),
                           child: Focus(
                             onKeyEvent: (node, event) {
                               return _handleKeyEvent(event)
@@ -407,16 +415,18 @@ class _QueryEditorScreenState extends ConsumerState<QueryEditorScreen> {
                               focusNode: _focusNode,
                               maxLines: null,
                               style: const TextStyle(
-                                color: Colors.white,
+                                color: AppTheme.primaryColor,
                                 fontFamily: 'monospace',
                                 fontSize: 14,
+                                height: 1.45,
                               ),
-                              decoration: InputDecoration(
+                              decoration: const InputDecoration(
                                 hintText: 'SELECT * FROM users;',
-                                hintStyle: TextStyle(
-                                  color: Colors.white.withOpacity(0.3),
-                                ),
                                 border: InputBorder.none,
+                                enabledBorder: InputBorder.none,
+                                focusedBorder: InputBorder.none,
+                                filled: false,
+                                contentPadding: EdgeInsets.zero,
                               ),
                             ),
                           ),
@@ -432,30 +442,31 @@ class _QueryEditorScreenState extends ConsumerState<QueryEditorScreen> {
                     ),
                 ],
               ),
-              // Results
+              const SizedBox(height: 16),
               Expanded(
                 child: Container(
                   width: double.infinity,
-                  padding: const EdgeInsets.all(16),
-                  color: Colors
-                      .transparent, // No extra background for results area
-                  child: _error != null
-                      ? Center(
-                          child: Text(
-                            _error!,
-                            style: const TextStyle(color: Colors.redAccent),
-                          ),
-                        )
-                      : _result == null
-                      ? Center(
-                          child: Text(
-                            'Execute a query to see results',
-                            style: TextStyle(
-                              color: Colors.white.withOpacity(0.5),
+                  padding: const EdgeInsets.all(18),
+                  decoration: AppTheme.panelDecoration(),
+                  child:
+                      _error != null
+                          ? Center(
+                            child: Text(
+                              _error!,
+                              style: const TextStyle(
+                                color: AppTheme.errorColor,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
-                          ),
-                        )
-                      : _buildResultsTable(),
+                          )
+                          : _result == null
+                          ? const Center(
+                            child: Text(
+                              'Execute a query to see results',
+                              style: TextStyle(color: AppTheme.mutedTextColor),
+                            ),
+                          )
+                          : _buildResultsTable(),
                 ),
               ),
             ],
@@ -475,41 +486,38 @@ class _QueryEditorScreenState extends ConsumerState<QueryEditorScreen> {
       scrollDirection: Axis.vertical,
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
-        child: DataTable(
-          headingRowColor: WidgetStateProperty.all(
-            AppTheme.primaryColor.withOpacity(0.2),
+        child: Theme(
+          data: Theme.of(context).copyWith(
+            dividerColor: AppTheme.borderColor,
           ),
-          columns: columns
-              .map(
-                (col) => DataColumn(
-                  label: Text(
-                    col,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              )
-              .toList(),
-          rows: rows
-              .map(
-                (row) => DataRow(
-                  cells: row
-                      .typedAssoc()
-                      .values
-                      .map(
-                        (value) => DataCell(
-                          Text(
-                            value?.toString() ?? 'NULL',
-                            style: const TextStyle(color: Colors.white70),
-                          ),
-                        ),
-                      )
-                      .toList(),
-                ),
-              )
-              .toList(),
+          child: DataTable(
+            columns:
+                columns
+                    .map((col) => DataColumn(label: Text(col)))
+                    .toList(),
+            rows:
+                rows
+                    .map(
+                      (row) => DataRow(
+                        cells:
+                            row
+                                .typedAssoc()
+                                .values
+                                .map(
+                                  (value) => DataCell(
+                                    Text(
+                                      value?.toString() ?? 'NULL',
+                                      style: const TextStyle(
+                                        color: AppTheme.mutedTextColor,
+                                      ),
+                                    ),
+                                  ),
+                                )
+                                .toList(),
+                      ),
+                    )
+                    .toList(),
+          ),
         ),
       ),
     );
@@ -529,36 +537,52 @@ class _DatabaseItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onDoubleTap: onDoubleTap,
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 4),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        decoration: isSelected
-            ? BoxDecoration(
-                color: AppTheme.primaryColor.withOpacity(0.3),
-                borderRadius: BorderRadius.circular(8),
-              )
-            : null,
-        child: Row(
-          children: [
-            Icon(
-              Icons.cabin,
-              color: isSelected ? Colors.white : Colors.white60,
-              size: 16,
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                name,
-                style: TextStyle(
-                  color: isSelected ? Colors.white : Colors.white60,
-                  fontSize: 13,
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 6),
+      child: Material(
+        color: isSelected ? const Color(0xFF1B232C) : Colors.transparent,
+        borderRadius: BorderRadius.circular(12),
+        child: InkWell(
+          onDoubleTap: onDoubleTap,
+          borderRadius: BorderRadius.circular(12),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            decoration:
+                isSelected
+                    ? BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: AppTheme.borderColor),
+                    )
+                    : null,
+            child: Row(
+              children: [
+                Icon(
+                  Icons.storage_rounded,
+                  color:
+                      isSelected
+                          ? AppTheme.secondaryColor
+                          : AppTheme.mutedTextColor,
+                  size: 16,
                 ),
-                overflow: TextOverflow.ellipsis,
-              ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    name,
+                    style: TextStyle(
+                      color:
+                          isSelected
+                              ? AppTheme.primaryColor
+                              : AppTheme.mutedTextColor,
+                      fontSize: 13,
+                      fontWeight:
+                          isSelected ? FontWeight.w600 : FontWeight.w400,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
@@ -573,29 +597,33 @@ class _TableItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        child: Row(
-          children: [
-            Icon(
-              Icons.table_chart_rounded,
-              color: Colors.white.withOpacity(0.5),
-              size: 14,
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                name,
-                style: TextStyle(
-                  color: Colors.white.withOpacity(0.7),
-                  fontSize: 12,
-                ),
-                overflow: TextOverflow.ellipsis,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(10),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          child: Row(
+            children: [
+              const Icon(
+                Icons.table_chart_rounded,
+                color: AppTheme.mutedTextColor,
+                size: 14,
               ),
-            ),
-          ],
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  name,
+                  style: const TextStyle(
+                    color: AppTheme.mutedTextColor,
+                    fontSize: 12,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

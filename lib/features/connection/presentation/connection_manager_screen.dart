@@ -59,12 +59,12 @@ class _ConnectionManagerScreenState
       await conn.close();
       setState(() {
         _isTesting = false;
-        _testResult = '✓ Connection successful!';
+        _testResult = 'Connection successful';
       });
     } catch (e) {
       setState(() {
         _isTesting = false;
-        _testResult = '✗ ${e.toString().replaceAll('Exception: ', '')}';
+        _testResult = e.toString().replaceAll('Exception: ', '');
       });
     }
   }
@@ -88,27 +88,18 @@ class _ConnectionManagerScreenState
 
   @override
   Widget build(BuildContext context) {
+    final hasSuccess = _testResult == 'Connection successful';
+
     return Scaffold(
-      extendBodyBehindAppBar: true,
       body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [Color(0xFF2E0249), Color(0xFF000000), Color(0xFF0F3460)],
-          ),
-        ),
+        decoration: AppTheme.appBackgroundDecoration,
         child: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.all(24.0),
+            padding: const EdgeInsets.all(24),
             child: Container(
               width: double.infinity,
               padding: const EdgeInsets.all(32),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(16),
-                color: Colors.white.withOpacity(0.1),
-                border: Border.all(color: Colors.white.withOpacity(0.1)),
-              ),
+              decoration: AppTheme.panelDecoration(elevated: true),
               child: SingleChildScrollView(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -118,18 +109,28 @@ class _ConnectionManagerScreenState
                         IconButton(
                           icon: const Icon(
                             Icons.arrow_back,
-                            color: Colors.white,
+                            color: AppTheme.mutedTextColor,
                           ),
                           onPressed: () => Navigator.pop(context),
                         ),
-                        const SizedBox(width: 16),
-                        Text(
-                          'New Connection',
-                          style: Theme.of(context).textTheme.headlineSmall
-                              ?.copyWith(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
+                        const SizedBox(width: 12),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'New Connection',
+                              style: Theme.of(
+                                context,
+                              ).textTheme.headlineSmall?.copyWith(
+                                fontWeight: FontWeight.w800,
                               ),
+                            ),
+                            const SizedBox(height: 4),
+                            const Text(
+                              'Create a clean connection profile.',
+                              style: TextStyle(color: AppTheme.mutedTextColor),
+                            ),
+                          ],
                         ),
                       ],
                     ),
@@ -140,30 +141,47 @@ class _ConnectionManagerScreenState
                       controller: _nameController,
                     ),
                     const SizedBox(height: 20),
-                    GlassTextField(
-                      label: 'Host',
-                      hint: 'localhost',
-                      controller: _hostController,
+                    Row(
+                      children: [
+                        Expanded(
+                          flex: 2,
+                          child: GlassTextField(
+                            label: 'Host',
+                            hint: 'localhost',
+                            controller: _hostController,
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: GlassTextField(
+                            label: 'Port',
+                            hint: '3306',
+                            controller: _portController,
+                            keyboardType: TextInputType.number,
+                          ),
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 20),
-                    GlassTextField(
-                      label: 'Port',
-                      hint: '3306',
-                      controller: _portController,
-                      keyboardType: TextInputType.number,
-                    ),
-                    const SizedBox(height: 20),
-                    GlassTextField(
-                      label: 'Username',
-                      hint: 'root',
-                      controller: _usernameController,
-                    ),
-                    const SizedBox(height: 20),
-                    GlassTextField(
-                      label: 'Password',
-                      hint: '••••••••',
-                      controller: _passwordController,
-                      obscureText: true,
+                    Row(
+                      children: [
+                        Expanded(
+                          child: GlassTextField(
+                            label: 'Username',
+                            hint: 'root',
+                            controller: _usernameController,
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: GlassTextField(
+                            label: 'Password',
+                            hint: '••••••••',
+                            controller: _passwordController,
+                            obscureText: true,
+                          ),
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 20),
                     GlassTextField(
@@ -171,20 +189,37 @@ class _ConnectionManagerScreenState
                       hint: 'my_database',
                       controller: _databaseController,
                     ),
-                    const SizedBox(height: 24),
-                    if (_testResult != null)
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 16),
+                    if (_testResult != null) ...[
+                      const SizedBox(height: 24),
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          color:
+                              hasSuccess
+                                  ? const Color(0xFF112219)
+                                  : const Color(0xFF241414),
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(
+                            color:
+                                hasSuccess
+                                    ? AppTheme.successColor
+                                    : AppTheme.errorColor,
+                          ),
+                        ),
                         child: Text(
                           _testResult!,
                           style: TextStyle(
-                            color: _testResult!.contains('✓')
-                                ? Colors.greenAccent
-                                : Colors.redAccent,
+                            color:
+                                hasSuccess
+                                    ? AppTheme.successColor
+                                    : AppTheme.errorColor,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
                       ),
+                    ],
+                    const SizedBox(height: 28),
                     Row(
                       children: [
                         GlassButton(
@@ -192,13 +227,14 @@ class _ConnectionManagerScreenState
                           icon: Icons.check_circle_outline,
                           onPressed: _testConnection,
                           isLoading: _isTesting,
-                          color: AppTheme.secondaryColor,
+                          color: AppTheme.elevatedSurfaceColor,
                         ),
                         const SizedBox(width: 12),
                         GlassButton(
                           text: 'Save',
-                          icon: Icons.save,
+                          icon: Icons.save_rounded,
                           onPressed: _saveConnection,
+                          color: AppTheme.secondaryColor,
                         ),
                       ],
                     ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sqlbench/core/theme/app_theme.dart';
 
 class GlassTextField extends StatelessWidget {
   final String? label;
@@ -27,31 +28,22 @@ class GlassTextField extends StatelessWidget {
           Text(
             label!,
             style: const TextStyle(
-              color: Colors.white70,
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
+              color: AppTheme.mutedTextColor,
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
             ),
           ),
           const SizedBox(height: 8),
         ],
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-            color: Colors.white.withOpacity(0.1),
-            border: Border.all(color: Colors.white.withOpacity(0.1)),
-          ),
-          child: TextField(
-            controller: controller,
-            obscureText: obscureText,
-            keyboardType: keyboardType,
-            onChanged: onChanged,
-            style: const TextStyle(color: Colors.white),
-            decoration: InputDecoration(
-              hintText: hint,
-              hintStyle: TextStyle(color: Colors.white.withOpacity(0.4)),
-              border: InputBorder.none,
-            ),
+        TextField(
+          controller: controller,
+          obscureText: obscureText,
+          keyboardType: keyboardType,
+          onChanged: onChanged,
+          style: const TextStyle(color: AppTheme.primaryColor),
+          decoration: InputDecoration(
+            hintText: hint,
+            hintStyle: const TextStyle(color: AppTheme.mutedTextColor),
           ),
         ),
       ],

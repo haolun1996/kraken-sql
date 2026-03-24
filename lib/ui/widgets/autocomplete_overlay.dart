@@ -7,10 +7,10 @@ class AutocompleteOverlay extends StatelessWidget {
   final int selectedIndex;
 
   const AutocompleteOverlay({
-    super.key,
     required this.suggestions,
     required this.onSelected,
     this.selectedIndex = 0,
+    super.key,
   });
 
   @override
@@ -19,22 +19,11 @@ class AutocompleteOverlay extends StatelessWidget {
 
     return Positioned(
       left: 16,
-      top: 80, // Position below the query input area
+      top: 80,
       child: Container(
-        width: 300,
+        width: 320,
         padding: const EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          color: Colors.white.withOpacity(0.1),
-          border: Border.all(color: Colors.white.withOpacity(0.1)),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              blurRadius: 16,
-              spreadRadius: 4,
-            ),
-          ],
-        ),
+        decoration: AppTheme.panelDecoration(elevated: true),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -45,32 +34,40 @@ class AutocompleteOverlay extends StatelessWidget {
                 final suggestion = suggestions[index];
                 final isSelected = index == selectedIndex;
                 return InkWell(
+                  borderRadius: BorderRadius.circular(12),
                   onTap: () => onSelected(suggestion),
                   child: Container(
                     width: double.infinity,
                     padding: const EdgeInsets.symmetric(
                       horizontal: 12,
-                      vertical: 8,
+                      vertical: 10,
                     ),
-                    decoration: isSelected
-                        ? BoxDecoration(
-                            color: AppTheme.primaryColor.withOpacity(0.3),
-                            borderRadius: BorderRadius.circular(8),
-                          )
-                        : null,
+                    decoration:
+                        isSelected
+                            ? BoxDecoration(
+                              color: const Color(0xFF212A34),
+                              borderRadius: BorderRadius.circular(12),
+                            )
+                            : null,
                     child: Row(
                       children: [
                         Icon(
                           _getIconForSuggestion(suggestion),
                           size: 16,
-                          color: isSelected ? Colors.white : Colors.white70,
+                          color:
+                              isSelected
+                                  ? AppTheme.secondaryColor
+                                  : AppTheme.mutedTextColor,
                         ),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
                             suggestion,
                             style: TextStyle(
-                              color: isSelected ? Colors.white : Colors.white70,
+                              color:
+                                  isSelected
+                                      ? AppTheme.primaryColor
+                                      : AppTheme.mutedTextColor,
                               fontSize: 13,
                               fontFamily: 'monospace',
                             ),
@@ -89,11 +86,9 @@ class AutocompleteOverlay extends StatelessWidget {
   }
 
   IconData _getIconForSuggestion(String suggestion) {
-    // Check if it's a SQL keyword (uppercase)
     if (suggestion == suggestion.toUpperCase()) {
-      return Icons.code;
+      return Icons.code_rounded;
     }
-    // Otherwise it's a table name
     return Icons.table_chart_rounded;
   }
 }
