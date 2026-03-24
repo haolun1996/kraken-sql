@@ -5,7 +5,7 @@ import 'package:sqlbench/features/connection/data/connection_model.dart';
 import 'package:sqlbench/features/connection/data/connection_provider.dart';
 import 'package:sqlbench/features/connection/presentation/connection_dialog.dart';
 import 'package:sqlbench/features/query_editor/presentation/query_editor_screen.dart';
-import 'package:sqlbench/ui/widgets/glass_button.dart';
+import 'package:sqlbench/ui/widgets/app_button.dart';
 
 class DashboardScreen extends ConsumerStatefulWidget {
   const DashboardScreen({super.key});
@@ -252,7 +252,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   ),
                 ),
                 const SizedBox(height: 24),
-                GlassButton(
+                AppButton(
                   text: 'New Connection',
                   icon: Icons.add_rounded,
                   onPressed: () async {
@@ -282,7 +282,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
             ),
             const Spacer(),
-            GlassButton(
+            AppButton(
               text: 'New',
               icon: Icons.add_rounded,
               onPressed: () async {
@@ -592,7 +592,7 @@ class _ConnectionCard extends StatelessWidget {
               ],
             ),
           ),
-          GlassButton(
+          AppButton(
             text: isActive ? 'Open' : 'Connect',
             icon: isActive ? Icons.open_in_new_rounded : Icons.link_rounded,
             onPressed: onConnect,

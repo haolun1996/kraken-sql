@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:sqlbench/core/theme/app_theme.dart';
 
-class GlassButton extends StatelessWidget {
+class AppButton extends StatelessWidget {
   final String text;
   final VoidCallback? onPressed;
   final IconData? icon;
   final Color? color;
   final bool isLoading;
 
-  const GlassButton({
+  const AppButton({
     required this.text,
     this.isLoading = false,
     this.onPressed,

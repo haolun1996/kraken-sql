@@ -6,7 +6,7 @@ import 'package:sqlbench/core/theme/app_theme.dart';
 import 'package:sqlbench/features/connection/data/connection_model.dart';
 import 'package:sqlbench/features/connection/data/connection_provider.dart';
 import 'package:sqlbench/ui/widgets/autocomplete_overlay.dart';
-import 'package:sqlbench/ui/widgets/glass_button.dart';
+import 'package:sqlbench/ui/widgets/app_button.dart';
 
 class QueryEditorScreen extends ConsumerStatefulWidget {
   final ConnectionModel connection;
@@ -386,7 +386,7 @@ class _QueryEditorScreenState extends ConsumerState<QueryEditorScreen> {
                               ],
                             ),
                             const Spacer(),
-                            GlassButton(
+                            AppButton(
                               text: 'Execute',
                               icon: Icons.play_arrow_rounded,
                               onPressed: _executeQuery,

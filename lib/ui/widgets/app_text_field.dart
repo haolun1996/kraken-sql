@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sqlbench/core/theme/app_theme.dart';
 
-class GlassTextField extends StatelessWidget {
+class AppTextField extends StatelessWidget {
   final String? label;
   final String? hint;
   final TextEditingController? controller;
@@ -9,7 +9,7 @@ class GlassTextField extends StatelessWidget {
   final TextInputType? keyboardType;
   final ValueChanged<String>? onChanged;
 
-  const GlassTextField({
+  const AppTextField({
     super.key,
     this.label,
     this.hint,

@@ -3,8 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sqlbench/core/theme/app_theme.dart';
 import 'package:sqlbench/features/connection/data/connection_model.dart';
 import 'package:sqlbench/features/connection/data/connection_provider.dart';
-import 'package:sqlbench/ui/widgets/glass_button.dart';
-import 'package:sqlbench/ui/widgets/glass_text_field.dart';
+import 'package:sqlbench/ui/widgets/app_button.dart';
+import 'package:sqlbench/ui/widgets/app_text_field.dart';
 
 class ConnectionManagerScreen extends ConsumerStatefulWidget {
   const ConnectionManagerScreen({super.key});
@@ -135,7 +135,7 @@ class _ConnectionManagerScreenState
                       ],
                     ),
                     const SizedBox(height: 32),
-                    GlassTextField(
+                    AppTextField(
                       label: 'Connection Name',
                       hint: 'Production DB',
                       controller: _nameController,
@@ -145,7 +145,7 @@ class _ConnectionManagerScreenState
                       children: [
                         Expanded(
                           flex: 2,
-                          child: GlassTextField(
+                          child: AppTextField(
                             label: 'Host',
                             hint: 'localhost',
                             controller: _hostController,
@@ -153,7 +153,7 @@ class _ConnectionManagerScreenState
                         ),
                         const SizedBox(width: 16),
                         Expanded(
-                          child: GlassTextField(
+                          child: AppTextField(
                             label: 'Port',
                             hint: '3306',
                             controller: _portController,
@@ -166,7 +166,7 @@ class _ConnectionManagerScreenState
                     Row(
                       children: [
                         Expanded(
-                          child: GlassTextField(
+                          child: AppTextField(
                             label: 'Username',
                             hint: 'root',
                             controller: _usernameController,
@@ -174,7 +174,7 @@ class _ConnectionManagerScreenState
                         ),
                         const SizedBox(width: 16),
                         Expanded(
-                          child: GlassTextField(
+                          child: AppTextField(
                             label: 'Password',
                             hint: '••••••••',
                             controller: _passwordController,
@@ -184,7 +184,7 @@ class _ConnectionManagerScreenState
                       ],
                     ),
                     const SizedBox(height: 20),
-                    GlassTextField(
+                    AppTextField(
                       label: 'Database (Optional)',
                       hint: 'my_database',
                       controller: _databaseController,
@@ -222,7 +222,7 @@ class _ConnectionManagerScreenState
                     const SizedBox(height: 28),
                     Row(
                       children: [
-                        GlassButton(
+                        AppButton(
                           text: 'Test Connection',
                           icon: Icons.check_circle_outline,
                           onPressed: _testConnection,
@@ -230,7 +230,7 @@ class _ConnectionManagerScreenState
                           color: AppTheme.elevatedSurfaceColor,
                         ),
                         const SizedBox(width: 12),
-                        GlassButton(
+                        AppButton(
                           text: 'Save',
                           icon: Icons.save_rounded,
                           onPressed: _saveConnection,
